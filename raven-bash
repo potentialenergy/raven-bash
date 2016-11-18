@@ -7,7 +7,9 @@ exec 4>&2
 exec 2>"$STDERR_TEMPFILE"
 
 logger_trap() {
-    raven-logger "$1" "$3" "$2" --env "`env`" --stderr "`cat $STDERR_TEMPFILE`" --pwd "`pwd`" --function "$5" --declares "`declare -p`" > /dev/null
+    local COMMAND=${RAVEN_CONTEXT:-$1}
+
+    raven-logger "$1" "$COMMAND" "$2" --env "`env`" --stderr "`cat $STDERR_TEMPFILE`" --pwd "`pwd`" --function "$5" --declares "`declare -p`" > /dev/null
     cat "$STDERR_TEMPFILE" 1>&2
     rm -f "$STDERR_TEMPFILE"
 }
