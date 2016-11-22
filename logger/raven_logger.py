@@ -11,8 +11,8 @@ CONFIG_FILE = '/etc/raven-bash.conf'
 
 
 class LoggerClient:
-    def __init__(self, dsn):
-        self._client = Client(dsn=dsn, context={})
+    def __init__(self, dsn, release):
+        self._client = Client(dsn=dsn, context={}, release=release)
 
     def _process_sourcefile(self, file_path, line_number, context_lines=10):
         FileContext = namedtuple('FileContext', ['pre_context', 'context', 'post_context', 'local_vars'])
@@ -122,6 +122,11 @@ def main():
         sys.stderr.write('Missing SENTRY_DSN config from {}\n'.format(CONFIG_FILE))
         sys.exit(1)
 
+    try:
+        release = os.environ['SENTRY_RELEASE']
+    except KeyError:
+        release = ''
+
     parser = argparse.ArgumentParser(description='Send error to Sentry')
 
     parser.add_argument('--env', help='Script environment')
@@ -137,7 +142,7 @@ def main():
 
     args = parser.parse_args()
 
-    client = LoggerClient(dsn)
+    client = LoggerClient(dsn, release)
     client.capture(args)
 
 if __name__ == '__main__':
