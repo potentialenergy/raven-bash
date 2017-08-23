@@ -106,7 +106,8 @@ class LoggerClient:
         if shell_args.stderr:
             # raven only accepts some number of list items
             #  but you probably want the end of the message
-            stderr_list = shell_args.stderr.splitlines()[-self._client.list_max_length:]
+            list_max_length = getattr(self._client, 'list_max_length', 50)
+            stderr_list = shell_args.stderr.splitlines()[-list_max_length:]
             extra['stderr'] = stderr_list
 
         self._client.capture('raven.events.Exception', data=data, extra=extra)
