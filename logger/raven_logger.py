@@ -104,7 +104,10 @@ class LoggerClient:
             extra['environment'] = dict([item.split('=', maxsplit=1) for item in shell_args.env.split('\n')])
 
         if shell_args.stderr:
-            extra['stderr'] = shell_args.stderr
+            # raven only accepts some number of list items
+            #  but you probably want the end of the message
+            stderr_list = shell_args.stderr.splitlines()[-self._client.list_max_length:]
+            extra['stderr'] = stderr_list
 
         self._client.capture('raven.events.Exception', data=data, extra=extra)
 
